@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { createConnection, escapeId } from 'mysql2/promise';
 import { AppModule } from '../src/app.module.js';
+import { configureApp } from '../src/configure-app.js';
 
 // Cada teste usa um banco novo; nunca limpa a base escola.
 export async function createDatabaseFixture() {
@@ -43,6 +44,7 @@ export async function createDatabaseFixture() {
         .useValue(new ConfigService({ ...process.env, DB_NAME: databaseName }))
         .compile();
       const app = module.createNestApplication();
+      configureApp(app);
       await app.init();
       return app;
     },

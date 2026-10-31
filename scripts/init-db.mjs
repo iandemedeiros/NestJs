@@ -33,10 +33,17 @@ try {
   if (columns.length === 0) {
     await connection.query('ALTER TABLE alunos ADD COLUMN email VARCHAR(150)');
   }
+  const [missingEmails] = await connection.query(
+    'SELECT COUNT(*) AS total FROM alunos WHERE email IS NULL',
+  );
+  if (missingEmails[0].total > 0) {
+    throw new Error('Existem alunos sem email. Preencha os emails desses registros e execute db:init novamente; nenhum registro foi apagado.');
+  }
+  await connection.query('ALTER TABLE alunos MODIFY COLUMN email VARCHAR(150) NOT NULL');
   await connection.query(
     await readFile(new URL('../database/seed.sql', import.meta.url), 'utf8'),
   );
-  console.log('Banco preparado: tabela alunos com email e dados iniciais.');
+  console.log('Banco preparado: alunos com email obrigatório, disciplinas e dados iniciais.');
 } finally {
   await connection.end();
 }
