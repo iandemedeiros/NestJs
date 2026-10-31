@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { AlunosModule } from './alunos/alunos.module.js';
 import { ProfessoresModule } from './professores/professores.module.js';
 import { DisciplinasModule } from './disciplinas/disciplinas.module.js';
+import { CursosModule } from './cursos/cursos.module.js';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DisciplinasModule } from './disciplinas/disciplinas.module.js';
     AlunosModule,
     ProfessoresModule,
     DisciplinasModule,
+    CursosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

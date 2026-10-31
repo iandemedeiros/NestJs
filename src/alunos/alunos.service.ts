@@ -3,13 +3,14 @@ import { AlunosRepository } from './alunos.repository.js';
 import { CreateAlunoDto } from './dto/create-aluno.dto.js';
 import { UpdateAlunoDto } from './dto/update-aluno.dto.js';
 import { PatchAlunoDto } from './dto/patch-aluno.dto.js';
+import { ListAlunosDto } from './dto/list-alunos.dto.js';
 
 @Injectable()
 export class AlunosService {
   constructor(private readonly alunosRepository: AlunosRepository) {}
 
-  findAll() {
-    return this.alunosRepository.findAll();
+  findAll(query: ListAlunosDto) {
+    return this.alunosRepository.findAll(query);
   }
 
   async findById(id: number) {

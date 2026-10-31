@@ -1,72 +1,66 @@
-import { Injectable } from '@nestjs/common';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { DatabaseService } from '../database/database.service.js';
+﻿import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { ListAlunosDto } from './dto/list-alunos.dto.js';
 
-export interface AlunoRow extends RowDataPacket {
-  id: number;
-  nome: string;
-  email: string;
-  curso: string;
-}
+type AlunoChanges = { nome?: string; email?: string; curso?: string };
 
 @Injectable()
 export class AlunosRepository {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    const [rows] = await this.databaseService.execute<AlunoRow[]>(
-      'SELECT id, nome, email, curso FROM alunos ORDER BY id',
-    );
-    return rows;
+  findAll(query: ListAlunosDto) {
+    return this.prisma.aluno.findMany({
+      where: {
+        curso: query.curso,
+        nome: query.nome === undefined ? undefined : { contains: query.nome },
+      },
+      orderBy: { id: 'asc' },
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
+    });
   }
 
-  async findById(id: number) {
-    const [rows] = await this.databaseService.execute<AlunoRow[]>(
-      'SELECT id, nome, email, curso FROM alunos WHERE id = ?',
-      [id],
-    );
-    return rows[0] ?? null;
+  findById(id: number) {
+    return this.prisma.aluno.findUnique({ where: { id } });
   }
 
-  async create(nome: string, email: string, curso: string) {
-    const [result] = await this.databaseService.execute<ResultSetHeader>(
-      'INSERT INTO alunos (nome, email, curso) VALUES (?, ?, ?)',
-      [nome, email, curso],
-    );
-    return { id: result.insertId, nome, email, curso };
+  create(nome: string, email: string, curso: string) {
+    return this.prisma.aluno.create({
+      data: {
+        nome,
+        email,
+        cursoDetalhes: {
+          connectOrCreate: { where: { nome: curso }, create: { nome: curso } },
+        },
+      },
+    });
   }
 
-  async update(id: number, nome: string, email: string, curso: string) {
-    const [result] = await this.databaseService.execute<ResultSetHeader>(
-      'UPDATE alunos SET nome = ?, email = ?, curso = ? WHERE id = ?',
-      [nome, email, curso, id],
-    );
-    return result.affectedRows;
+  update(id: number, nome: string, email: string, curso: string) {
+    return this.patch(id, { nome, email, curso });
   }
 
-  async patch(
-    id: number,
-    data: Partial<Pick<AlunoRow, 'nome' | 'email' | 'curso'>>,
-  ) {
-    const fields = (['nome', 'email', 'curso'] as const).filter(
-      (field) => data[field] !== undefined,
-    );
-    if (fields.length === 0) return 0;
-    // Nomes de colunas vêm apenas da lista fixa; valores usam parâmetros.
-    const assignments = fields.map((field) => `${field} = ?`).join(', ');
-    const values = fields.map((field) => data[field]!);
-    const [result] = await this.databaseService.execute<ResultSetHeader>(
-      `UPDATE alunos SET ${assignments} WHERE id = ?`,
-      [...values, id],
-    );
-    return result.affectedRows;
+  patch(id: number, data: AlunoChanges) {
+    return this.prisma.aluno.update({
+      where: { id },
+      data: {
+        nome: data.nome,
+        email: data.email,
+        cursoDetalhes:
+          data.curso === undefined
+            ? undefined
+            : {
+                connectOrCreate: {
+                  where: { nome: data.curso },
+                  create: { nome: data.curso },
+                },
+              },
+      },
+    });
   }
 
   async delete(id: number) {
-    const [result] = await this.databaseService.execute<ResultSetHeader>(
-      'DELETE FROM alunos WHERE id = ?',
-      [id],
-    );
-    return result.affectedRows;
+    await this.prisma.aluno.delete({ where: { id } });
+    return 1;
   }
 }

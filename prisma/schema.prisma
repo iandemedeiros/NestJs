@@ -1,0 +1,36 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "js"
+  moduleFormat        = "esm"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Aluno {
+  id            Int    @id @default(autoincrement())
+  nome          String @db.VarChar(100)
+  email         String @unique @db.VarChar(150)
+  curso         String @db.VarChar(100)
+  cursoDetalhes Curso  @relation(fields: [curso], references: [nome], onDelete: Restrict, onUpdate: Cascade)
+
+  @@map("alunos")
+}
+
+model Disciplina {
+  id           Int    @id @default(autoincrement())
+  nome         String @db.VarChar(100)
+  cargaHoraria Int    @map("carga_horaria")
+
+  @@map("disciplinas")
+}
+
+model Curso {
+  id     Int     @id @default(autoincrement())
+  nome   String  @unique @db.VarChar(100)
+  alunos Aluno[]
+
+  @@map("cursos")
+}
