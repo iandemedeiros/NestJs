@@ -36,18 +36,12 @@ export class AlunosController {
   }
 
   @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: UpdateAlunoDto,
-  ) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateAlunoDto) {
     return this.service.update(id, data);
   }
 
   @Patch(':id')
-  patch(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: PatchAlunoDto,
-  ) {
+  patch(@Param('id', ParseIntPipe) id: number, @Body() data: PatchAlunoDto) {
     return this.service.patch(id, data);
   }
 

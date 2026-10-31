@@ -52,12 +52,11 @@ describe.each([
       .expect({ id: 3, ...alterado });
     await request(server)
       .delete(`${rota}/1`)
-      .expect(200)
-      .expect(recurso === 'alunos' ? '1' : 'true');
+      .expect(recurso === 'alunos' ? 204 : 200)
+      .expect(recurso === 'alunos' ? '' : 'true');
     await request(server)
       .delete(`${rota}/1`)
-      .expect(200)
-      .expect(recurso === 'alunos' ? '0' : 'false');
+      .expect(recurso === 'alunos' ? 404 : 200);
     await request(server)
       .post(rota)
       .send(dados)
@@ -97,10 +96,7 @@ describe.each([
         .get('/alunos')
         .expect(200);
       expect(lista.body).toHaveLength(3);
-      await request(app.getHttpServer())
-        .get('/alunos/99999')
-        .expect(200)
-        .expect('');
+      await request(app.getHttpServer()).get('/alunos/99999').expect(404);
     });
   }
 });

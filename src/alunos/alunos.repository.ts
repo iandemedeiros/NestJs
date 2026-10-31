@@ -44,7 +44,10 @@ export class AlunosRepository {
     return result.affectedRows;
   }
 
-  async patch(id: number, data: Partial<Pick<AlunoRow, 'nome' | 'email' | 'curso'>>) {
+  async patch(
+    id: number,
+    data: Partial<Pick<AlunoRow, 'nome' | 'email' | 'curso'>>,
+  ) {
     const fields = (['nome', 'email', 'curso'] as const).filter(
       (field) => data[field] !== undefined,
     );
