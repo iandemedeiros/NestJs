@@ -23,6 +23,8 @@
 
 ## Description
 
+Implementação das aulas de API de alunos: veja [configuração do MySQL, rotas e testes](database/README.md).
+
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Project setup

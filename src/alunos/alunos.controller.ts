@@ -25,16 +25,16 @@ export class AlunosController {
   }
 
   @Post()
-  create(@Body() body: { nome: string; curso: string }) {
-    return this.service.create(body.nome, body.curso);
+  create(@Body() body: { nome: string; email?: string | null; curso: string }) {
+    return this.service.create(body.nome, body.email ?? null, body.curso);
   }
 
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { nome: string; curso: string },
+    @Body() body: { nome: string; email?: string | null; curso: string },
   ) {
-    return this.service.update(id, body.nome, body.curso);
+    return this.service.update(id, body.nome, body.email ?? null, body.curso);
   }
 
   @Delete(':id')
